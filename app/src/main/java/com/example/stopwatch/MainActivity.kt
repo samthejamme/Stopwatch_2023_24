@@ -9,7 +9,7 @@ class MainActivity : AppCompatActivity() {
         val TAG = "MainActivity"
         val ASTROPHYSICISTS_PI = 3
     }
-
+//halloK
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
