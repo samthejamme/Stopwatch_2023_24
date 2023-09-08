@@ -14,5 +14,25 @@
         android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
+
+    <Button
+        android:id="@+id/button_main_startbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        app:layout_constraintEnd_toStartOf="@+id/chronometer_main_stopwatch"
+        app:layout_constraintTop_toBottomOf="@+id/chronometer_main_stopwatch" />
+
+    <Button
+        android:id="@+id/button2_main_stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        app:layout_constraintStart_toEndOf="@+id/chronometer_main_stopwatch"
+        app:layout_constraintTop_toBottomOf="@+id/chronometer_main_stopwatch" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
