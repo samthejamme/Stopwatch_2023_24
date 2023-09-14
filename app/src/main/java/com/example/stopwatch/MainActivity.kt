@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.widget.Button
 import android.widget.Chronometer
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
     private lateinit var startButton: Button
@@ -21,6 +22,9 @@ class MainActivity : AppCompatActivity() {
 
         // make constants for you key-value pairs
         val STATE_DISPLAY_TIME = ""
+        val IS_STATE_RUNNING = ""
+        val IS_STATE_PAUSED = ""
+        val IS_STATE_STOOPED = ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,25 +32,30 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.d(TAG, "onCreate: this is a log")
 
-        //wireWidgets()
+        startButton = findViewById(R.id.button_main_startbutton)
+        stopButton = findViewById(R.id.button2_main_stopButton)
+//        timer = findViewById(R.id.chronometer_main_stopwatch)
+
+        wireWidgets()
 
         // restore saveInstanceState if it exists
         if(savedInstanceState != null) {
             displayTime = savedInstanceState.getLong(STATE_DISPLAY_TIME)
-            timer.base = Math.abs(SystemClock.elapsedRealtime())
+            started = savedInstanceState.getBoolean(IS_STATE_RUNNING)
+            timer.base = SystemClock.elapsedRealtime() - displayTime
+            timer.start()
+
+            started = true; stopped = false; paused = false
         }
 
-        startButton = findViewById(R.id.button_main_startbutton)
-        stopButton = findViewById(R.id.button2_main_stopButton)
-        timer = findViewById(R.id.chronometer_main_stopwatch)
         startButton.setOnClickListener() {
             timer.start()
-            timer.base = displayTime
+            timer.base = SystemClock.elapsedRealtime() + stoppedTime
             if(stopped)
             { // if it's BEEN stopped
                 itsStarted()
                 startButton.text = "Resume"
-                stopButton.text = "Pause"
+                stopButton.text = "Pause" // include this when it gets started again from rotating
             }
             else if(paused) {
                 // if it's BEEN paused
@@ -58,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
         stopButton.setOnClickListener() {
             timer.stop()
-            stoppedTime = SystemClock.elapsedRealtime()
+            stoppedTime = timer.base - SystemClock.elapsedRealtime()
             if(started) {
                 // if it's BEEN started
                 itsPaused()
@@ -70,22 +79,29 @@ class MainActivity : AppCompatActivity() {
                 itsStopped()
                 startButton.text = "Start"
                 stopButton.text = "Stop"
+                timer.base = SystemClock.elapsedRealtime()
             }
         }
     }
 
-//    override fun onSaveInstanceState(outState: Bundle?) {
-//        if(started) {
-//            displayTime = SystemClock.elapsedRealtime() - timer.base
-//        }
-//        // if it weren't running, you would have saved the displaytime in the stop button's onclick listener
-//
-//        // save key-value pairs to the bundle before the superclass call
-//        outState?.putLong(STATE_DISPLAY_TIME, displayTime)
-//        if (outState != null) {
-//            super.onSaveInstanceState(outState)
-//        }
-//    }
+    private fun wireWidgets() {
+        timer = findViewById(R.id.chronometer_main_stopwatch)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        // calculate the display time if currently running
+        if(started) {
+            displayTime = timer.base - SystemClock.elapsedRealtime()
+        }
+        // save key-value pairs to the bundle before the superclass call
+        outState.putLong(STATE_DISPLAY_TIME, displayTime)
+        outState.putBoolean(IS_STATE_RUNNING, started)
+        outState.putBoolean(IS_STATE_PAUSED, paused)
+        outState.putBoolean(IS_STATE_STOOPED, stopped)
+
+        super.onSaveInstanceState(outState)
+    }
+
 
     // for future reference Integer.parseInt(timer.text.toString())
 
@@ -113,7 +129,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun itsStopped() {
-        started = false
+         started = false
         stopped = true
         paused = false
     }
